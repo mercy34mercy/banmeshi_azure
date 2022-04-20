@@ -86,7 +86,6 @@ def index():
 def get_all():
     data = get_db()
     # datas = data.split("/")
-    
     return data
 
 # @app.route('/getall_recipe')
