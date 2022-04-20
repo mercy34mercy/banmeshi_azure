@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from database_files.database_sample import get_db
 from flask import Flask
 from flask import request
 from database_files.database import get_db_recipe_one
@@ -80,13 +81,13 @@ def index():
 #             print('error:' + str(e))
 #         return "sucess"
 
-#DBから出力
-# @app.route('/getall')
-# def get_all():
-#     data = get_db()
-#     # datas = data.split("/")
+# DBから出力
+@app.route('/getall')
+def get_all():
+    data = get_db()
+    # datas = data.split("/")
     
-#     return data
+    return data
 
 # @app.route('/getall_recipe')
 # def get_all_recipe():
