@@ -2,7 +2,10 @@
 from database_files.database_sample import get_db
 from flask import Flask
 from flask import request
+from database_files.database import get_db_recipe
 from database_files.database import get_db_recipe_one
+from database_files.database import add_db
+from database_files.request_rakuten import get_datas
 
 app = Flask(__name__)
 
@@ -54,20 +57,20 @@ def index():
 #         return "error"
 #     return "success"
 
-#カテゴリにリクエストして、レシピをDBに保存
-# @app.route('/requestrakuten')
-# def requestrakuten():
-#     try:
-#         datas = get_datas()
-#         add_db(datas)
-#     except Exception as e:
-#         print('=== エラー内容 ===')
-#         print('type:' + str(type(e)))
-#         print('args:' + str(e.args))
-#         print('message:' + e.message)
-#         print('error:' + str(e))
-#         return e
-#     return "sucess"
+# カテゴリにリクエストして、レシピをDBに保存
+@app.route('/requestrakuten')
+def requestrakuten():
+    try:
+        datas = get_datas()
+        add_db(datas)
+    except Exception as e:
+        print('=== エラー内容 ===')
+        print('type:' + str(type(e)))
+        print('args:' + str(e.args))
+        print('message:' + e.message)
+        print('error:' + str(e))
+        return e
+    return "sucess"
 
 # @app.route('/requestrecipe')
 # def requestrecipe():
@@ -88,16 +91,16 @@ def get_all():
     # datas = data.split("/")
     return data
 
-# @app.route('/getall_recipe')
-# def get_all_recipe():
-#     data = get_db_recipe()
-#     print(data)
-#     return "1"
+@app.route('/getall_recipe')
+def get_all_recipe():
+    data = get_db_recipe()
+    print(data)
+    return "1"
 
 
 
-@app.route('/get_db_recipe_one',methods=['POST','GET'])
-def get_recipe_one():
+@app.route('/random_one_by_mate',methods=['POST','GET'])
+def get_recipe_from_db():
     if request.method == 'POST':
         print(request.json)
         data = get_db_recipe_one(request.json["data"])

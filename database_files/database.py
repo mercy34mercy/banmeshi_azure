@@ -206,7 +206,7 @@ def get_db_recipe_one(jsondata):
         
     con = sqlite3.connect(db_path_recipe)  # データベースに接続
     cur = con.cursor()				# カーソルを取得
-    cur.execute('SELECT * FROM RECIPE where %s' %q_data)
+    cur.execute('SELECT * FROM RECIPE where %s ORDER BY random() LIMIT 1' %q_data)
     datas=cur.fetchall()
     jsonify = ({
           "data":[]
@@ -225,7 +225,7 @@ def get_db_recipe_one(jsondata):
         
         add_data = {
                 "foodImageUrl": data[0],
-                "   ":data[1],
+                "mediumImageUrl":data[1],
                 "recipeCost":data[2],
                 "recipeId":data[3],
                 "recipeMaterial":jsonnify2["recipeMaterial"],
