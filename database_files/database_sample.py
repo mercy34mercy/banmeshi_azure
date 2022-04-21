@@ -16,7 +16,7 @@ def get_db():
     for data in datas:
         print(data)
 
-    return data
+    return str(datas)
 
 def get_db_one(category):
     con = sqlite3.connect(db_path)  # データベースに接続
