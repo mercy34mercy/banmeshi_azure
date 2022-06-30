@@ -1,10 +1,10 @@
-import csv
 import sqlite3
-import json
-from typing import Text
+import uuid
 
 db_path = "banmeshi.db"			# データベースファイル名を指定
 db_path_recipe = "recipe.db"
+
+new_db_path = "recipe_ver2.db"
 
 
 def initialize_db():
@@ -43,45 +43,56 @@ def initialize_db():
 # smallImageUrl
 
 def initialize_recipe_db():
-    con = sqlite3.connect(db_path_recipe)
+    con = sqlite3.connect(new_db_path)
     cur = con.cursor()
-    cur.execute('''CREATE TABLE RECIPE
-                (foodImageUrl text,
-                mediumImageUrl text,
-                recipeCost text,
-                recipeId text UNIQUE,
-                recipeMaterial text,
-                recipeTitle text,
-                recipeUrl text,
-                smallImageUrl text)''')
+    cur.execute("PRAGMA foreign_keys = ON;")
+    
+    # cur.execute('''CREATE TABLE RECIPE
+    #             (foodImageUrl text,
+    #             mediumImageUrl text,
+    #             recipeCost text,
+    #             recipeId text PRIMARY KEY,
+    #             recipeTitle text,
+    #             recipeUrl text,
+    #             smallImageUrl text)''')
+    
+    # cur.execute('''
+    #             CREATE TABLE MATERIAL
+	# 							(material text,
+	# 							materialId text, PRIMARY KEY(material,materialId))''')
+    
+    cur.execute('''CREATE TABLE CONNECTION
+								(materialid text,recipeid text,FOREIGN KEY(materialId) REFERENCES MATERIAL(materialId), FOREIGN KEY(recipeId) REFERENCES RECIPE(recipeId))''')
     
     con.commit()					# データベース更新の確定
     con.close()						# データベースを閉じる
     
     
 def add_recipe(jsondata):
-    con = sqlite3.connect(db_path_recipe)
+    con = sqlite3.connect(new_db_path)
     cur = con.cursor()
     # print(jsondata)
- 
+    cur.execute("PRAGMA foreign_keys = ON;")
+    
+    
     
     text = ""
     i = 0
     for data in jsondata["data"]:
             text = ""
             for l in range(len(data["recipeMaterial"])):
-                if i != 0:
-                    text += ","
-                text += data["recipeMaterial"][l]
-                i+=1
-            # print(text)
-            # print(data["recipeMaterial"])
+                try:
+                    uid = str(uuid.uuid4())
+                    cur.execute('insert into material(material,materialId) value(?,?);',((data["recipeMaterial"][l]),uid) )
+                except:
+                    print(data["recipeMaterial"][l] + "はもう既にあります")
+
             try:
-                cur.execute('insert into RECIPE(foodImageUrl,mediumImageUrl,recipeCost,recipeId,recipeMaterial,recipeTitle,recipeUrl,smallImageUrl) values (?,?,?,?,?,?,?,?);', (data["foodImageUrl"],data["mediumImageUrl"],data["recipeCost"],data["recipeId"],data["recipeTitle"],text,data["recipeUrl"],data["smallImageUrl"]))
+                cur.execute('insert into RECIPE(foodImageUrl,mediumImageUrl,recipeCost,recipeId,recipeTitle,recipeUrl,smallImageUrl) values (?,?,?,?,?,?,?,?);', (data["foodImageUrl"],data["mediumImageUrl"],data["recipeCost"],data["recipeId"],data["recipeTitle"],data["recipeUrl"],data["smallImageUrl"]))
                 print("succsess")
             except:
                 try:
-                    cur.execute('update RECIPE set foodImageUrl=? ,mediumImageUrl=? ,recipeCost=? ,recipeMaterial=? ,recipeTitle=? ,recipeUrl=? ,smallImageUrl=?  where recipeId = ?',(data["foodImageUrl"],data["mediumImageUrl"],data["recipeCost"],text,data["recipeTitle"],data["recipeUrl"],data["smallImageUrl"],data["recipeId"]))
+                    cur.execute('update RECIPE set foodImageUrl=? ,mediumImageUrl=? ,recipeCost=? ,recipeTitle=? ,recipeUrl=? ,smallImageUrl=?  where recipeId = ?',(data["foodImageUrl"],data["mediumImageUrl"],data["recipeCost"],data["recipeTitle"],data["recipeUrl"],data["smallImageUrl"],data["recipeId"]))
                     
                 except Exception as e:
                     print('=== エラー内容 ===')
@@ -90,6 +101,10 @@ def add_recipe(jsondata):
                     print('message:' + e.message)
                     print('error:' + str(e))
                     
+            try:
+                cur.execute('inset into CONNECTION(recipeId,materialId) value(?,?)' ,(data["recipeId"],uid))
+            except:
+                print(data["recipeId"])
             
                         
     con.commit()					# データベース更新の確定
@@ -279,4 +294,6 @@ def delete_db():
             cur.execute('DELETE FROM RECIPE where recipeId = %s'%data[3])
         else:
             print("safe")
+            
+initialize_recipe_db()
 
