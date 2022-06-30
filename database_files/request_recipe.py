@@ -25,9 +25,11 @@ def get_recipes():
       "categoryId":category["categoy"],
       }
       time.sleep(10)
+      print(category["categoy"])
       
       responses = requests.get(url, params=params)
       jsondata = responses.json()  
+      # print(jsondata)
   
 
   
@@ -47,9 +49,11 @@ def get_recipes():
               }
             
               jsonify["data"].append(add_data)
+              print(jsonify)
               add_recipe(jsonify)
       except:
-        time.sleep(600)
+        print("お休みします")
+        # time.sleep(600)
               
 
 

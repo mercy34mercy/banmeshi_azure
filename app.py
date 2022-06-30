@@ -6,6 +6,7 @@ from database_files.database import get_db_recipe
 from database_files.database import get_db_recipe_one
 from database_files.database import add_db
 from database_files.request_rakuten import get_datas
+from database_files.request_recipe import get_recipes
 
 app = Flask(__name__)
 
@@ -72,17 +73,17 @@ def requestrakuten():
         return e
     return "sucess"
 
-# @app.route('/requestrecipe')
-# def requestrecipe():
-#         try:
-#             datas = get_recipes()
-#         except Exception as e:
-#             print('=== エラー内容 ===')
-#             print('type:' + str(type(e)))
-#             print('args:' + str(e.args))
-#             print('message:' + e.message)
-#             print('error:' + str(e))
-#         return "sucess"
+@app.route('/requestrecipe')
+def requestrecipe():
+        try:
+            datas = get_recipes()
+        except Exception as e:
+            print('=== エラー内容 ===')
+            print('type:' + str(type(e)))
+            print('args:' + str(e.args))
+            print('message:' + e.message)
+            print('error:' + str(e))
+        return "sucess"
 
 # DBから出力
 @app.route('/getall')

@@ -74,17 +74,18 @@ def add_recipe(jsondata):
     # print(jsondata)
     cur.execute("PRAGMA foreign_keys = ON;")
     
-    
-    
-    text = ""
-    i = 0
+    uidlist = []
     for data in jsondata["data"]:
             text = ""
             for l in range(len(data["recipeMaterial"])):
                 try:
                     uid = str(uuid.uuid4())
-                    cur.execute('insert into material(material,materialId) value(?,?);',((data["recipeMaterial"][l]),uid) )
+                    uidlist.append(uid)
+                    cur.execute('insert into material(material,materialId) value(?,?);',((data["recipeMaterial"][l]),uid))
                 except:
+                    cur.execute('select materialId from MATERIAL where material = ?',(data["recipeMaterial"]))
+                    uidlist.pop(-1)
+                    uidlist.append(cur[0])
                     print(data["recipeMaterial"][l] + "はもう既にあります")
 
             try:
@@ -100,11 +101,11 @@ def add_recipe(jsondata):
                     print('args:' + str(e.args))
                     print('message:' + e.message)
                     print('error:' + str(e))
-                    
-            try:
-                cur.execute('inset into CONNECTION(recipeId,materialId) value(?,?)' ,(data["recipeId"],uid))
-            except:
-                print(data["recipeId"])
+            for id in uidlist:        
+                try:
+                    cur.execute('inset into CONNECTION(recipeId,materialId) value(?,?)' ,(data["recipeId"],id))
+                except:
+                    print(data["recipeId"])
             
                         
     con.commit()					# データベース更新の確定
@@ -295,5 +296,4 @@ def delete_db():
         else:
             print("safe")
             
-initialize_recipe_db()
 
