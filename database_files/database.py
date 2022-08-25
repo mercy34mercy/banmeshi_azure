@@ -177,7 +177,7 @@ def get_db_recipe():
     data  = []
     con = sqlite3.connect(db_path_recipe)  # データベースに接続
     cur = con.cursor()				# カーソルを取得
-    cur.execute('SELECT recipeMaterial  FROM RECIPE')
+    cur.execute('SELECT recipeMaterial  FROM RECIPE ORDER BY random() LIMIT 100')
     datas=cur.fetchall()
     for data in datas:
         print(data)
