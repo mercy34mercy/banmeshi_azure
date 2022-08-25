@@ -200,10 +200,6 @@ def get_db_recipe_one(jsondata):
         q_data+= ' recipeMaterial like \"%' +  i + "%\" "
         l+=1
        
-    
-    
-    
-        
     con = sqlite3.connect(db_path_recipe)  # データベースに接続
     cur = con.cursor()				# カーソルを取得
     cur.execute('SELECT * FROM RECIPE where %s ORDER BY random() LIMIT 1' %q_data)
@@ -211,9 +207,6 @@ def get_db_recipe_one(jsondata):
     jsonify = ({
           "data":[]
         })
-    
-
-    
     
     for data in datas:      
         materials = data[4].split(',')
@@ -279,4 +272,55 @@ def delete_db():
             cur.execute('DELETE FROM RECIPE where recipeId = %s'%data[3])
         else:
             print("safe")
+
+
+
+# json形式でPOSTされたデータをsqlに直してjsonデータを返却する
+def get_db_recipe(jsondata):
+    
+    data  = []
+     
+    # POSTされたjsonを分けて保存する
+    q_data = ""
+    
+    l = 0
+    for i in jsondata:
+        print(i)
+        if l!=0:
+             q_data+=("AND")
+        
+        q_data+= ' recipeMaterial like \"%' +  i + "%\" "
+        l+=1
+       
+    con = sqlite3.connect(db_path_recipe)  # データベースに接続
+    cur = con.cursor()				# カーソルを取得
+    cur.execute('SELECT * FROM RECIPE where %s' %q_data)
+    datas=cur.fetchall()
+    jsonify = ({
+          "data":[]
+        })
+    
+    for data in datas:      
+        materials = data[4].split(',')
+        jsonnify2 =({ "recipeMaterial":[]
+    })
+        for material in materials:
+            if len(str(material))>1:
+                jsonnify2["recipeMaterial"].append(material)
+        
+        add_data = {
+                "foodImageUrl": data[0],
+                "mediumImageUrl":data[1],
+                "recipeCost":data[2],
+                "recipeId":data[3],
+                "recipeMaterial":jsonnify2["recipeMaterial"],
+                "threeRecipeMaterial":jsonnify2["recipeMaterial"][:3],
+                "recipeTitle":data[5],
+                "recipeUrl":data[6],
+                "smallImageUrl":data[7]
+              }
+        jsonify["data"].append(add_data)
+        
+    print(jsonify)
+    return jsonify
 

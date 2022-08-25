@@ -97,6 +97,17 @@ def get_all_recipe():
     print(data)
     return "1"
 
+@app.route('/recipe_by_mate',methods=['POST','GET'])
+def get_recipe_db():
+    if request.method == 'POST':
+        print(request.json)
+        data = get_db_recipe(request.json["data"])
+        print(data)
+    else:
+        return "method POST ONLY"
+
+
+    return data
 
 
 @app.route('/random_one_by_mate',methods=['POST','GET'])
